@@ -3,7 +3,7 @@
 import { headers } from "next/headers";
 import { z } from "zod";
 import { getSupabaseAdmin } from "@/lib/supabase";
-import { sendWaitlistEmail } from "@/lib/email";
+import { sendOwnerNotification, sendWaitlistEmail } from "@/lib/email";
 
 export type WaitlistState = {
   status: "idle" | "success" | "error";
@@ -64,11 +64,14 @@ export async function joinWaitlist(_prev: WaitlistState, formData: FormData): Pr
     return { status: "error", message: "Something went wrong on our side. Please try again.", values };
   }
 
-  try {
-    await sendWaitlistEmail({ to: email, name: firstName, interest });
-  } catch (e) {
-    console.error("[waitlist] email failed", e); // signup still counts
-  }
+  // Both emails are best-effort: the signup is already saved even if one fails.
+  const results = await Promise.allSettled([
+    sendWaitlistEmail({ to: email, name: firstName, interest }),
+    sendOwnerNotification({ name, email, interest, country }),
+  ]);
+  results.forEach((r) => {
+    if (r.status === "rejected") console.error("[waitlist] email failed:", r.reason);
+  });
 
   return { status: "success", name: firstName };
 }

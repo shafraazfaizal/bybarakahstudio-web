@@ -7,13 +7,16 @@ const LABEL: Record<string, string> = { nur: "NUR", kids: "My Ramadan Book", bot
 export async function sendWaitlistEmail({ to, name, interest }: { to: string; name: string; interest: string }) {
   const key = process.env.RESEND_API_KEY;
   const from = process.env.WAITLIST_FROM_EMAIL; // e.g. "ByBarakahStudio <barakah@skayl.digital>"
-  if (!key || !from) return; // email is optional — signups still save without it
+  if (!key || !from) {
+    console.warn("[waitlist] confirmation email skipped: RESEND_API_KEY or WAITLIST_FROM_EMAIL is not set");
+    return;
+  }
 
   const resend = new Resend(key);
   const books = LABEL[interest] ?? "our journals";
   const safeName = name.replace(/[<>&"]/g, "");
 
-  await resend.emails.send({
+  const { error } = await resend.emails.send({
     from,
     to,
     replyTo: process.env.WAITLIST_REPLY_TO || undefined,
@@ -31,4 +34,37 @@ We'll email you about three weeks before Ramadan, when orders open, إن شاء 
 <tr><td style="padding-top:34px;font-family:Georgia,serif;font-style:italic;font-size:15px;color:#7b5a1c">With duas,<br>ByBarakahStudio</td></tr>
 </table></td></tr></table></body></html>`,
   });
+  if (error) throw new Error(`Resend rejected confirmation email: ${error.message}`);
+}
+
+const COUNTRY: Record<string, string> = { uk: "United Kingdom", sri_lanka: "Sri Lanka", elsewhere: "Elsewhere" };
+
+/** Tells you (the owner) that someone joined. Sent to WAITLIST_NOTIFY_EMAIL. */
+export async function sendOwnerNotification(s: { name: string; email: string; interest: string; country: string }) {
+  const key = process.env.RESEND_API_KEY;
+  const from = process.env.WAITLIST_FROM_EMAIL;
+  const notify = process.env.WAITLIST_NOTIFY_EMAIL; // e.g. bybarakahstudio@gmail.com
+  if (!key || !from || !notify) {
+    console.warn("[waitlist] owner notification skipped: RESEND_API_KEY, WAITLIST_FROM_EMAIL or WAITLIST_NOTIFY_EMAIL is not set");
+    return;
+  }
+  const clean = (v: string) => v.replace(/[<>&"]/g, "");
+  const rows: [string, string][] = [
+    ["Name", clean(s.name)],
+    ["Email", clean(s.email)],
+    ["Journal", LABEL[s.interest] ?? s.interest],
+    ["Location", COUNTRY[s.country] ?? s.country],
+    ["Time", new Date().toLocaleString("en-GB", { timeZone: "Europe/London" })],
+  ];
+  const { error } = await new Resend(key).emails.send({
+    from,
+    to: notify,
+    replyTo: s.email,
+    subject: `New waitlist signup: ${clean(s.name)} (${LABEL[s.interest] ?? s.interest})`,
+    text: rows.map(([k, v]) => `${k}: ${v}`).join("\n"),
+    html: `<div style="font-family:Helvetica,Arial,sans-serif;font-size:15px;color:#0e1822"><p style="font-size:18px;font-weight:700">New waitlist signup</p><table cellpadding="6" style="border-collapse:collapse">${rows
+      .map(([k, v]) => `<tr><td style="color:#7b5a1c">${k}</td><td><strong>${v}</strong></td></tr>`)
+      .join("")}</table></div>`,
+  });
+  if (error) throw new Error(`Resend rejected owner notification: ${error.message}`);
 }
