@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import "@fontsource/archivo-black/400.css";
+@import "@fontsource-variable/bricolage-grotesque/standard.css";
 @import "@fontsource/bodoni-moda/400-italic.css";
 @import "@fontsource/bodoni-moda/500-italic.css";
 @import "@fontsource/inter-tight/400.css";
@@ -22,7 +22,7 @@
   --color-gold-2: #d4b56a;
   --color-ember: #c9874f;
 
-  --font-display: "Archivo Black", "Arial Black", sans-serif;
+  --font-display: "Bricolage Grotesque Variable", "Bricolage Grotesque", "Helvetica Neue", sans-serif;
   --font-swash: "Bodoni Moda", "Didot", serif;
   --font-sans: "Inter Tight", "Helvetica Neue", Arial, sans-serif;
   --font-arabic: "Amiri", "Noto Naskh Arabic", serif;
@@ -59,7 +59,7 @@ body {
 
 .lattice { background-image: var(--lattice); background-size: 120px 120px; }
 .arch { clip-path: url(#arch); }
-.font-display { letter-spacing: -0.055em; line-height: .86; }
+.font-display { font-weight: 600; font-variation-settings: "opsz" 96, "wdth" 100; letter-spacing: -0.045em; line-height: .88; }
 .swash { font-family: var(--font-swash); font-style: italic; font-weight: 400; letter-spacing: -0.01em; }
 .arabic { font-family: var(--font-arabic); }
 .eyebrow { font-family: var(--font-sans); font-size: .72rem; letter-spacing: .32em; text-transform: uppercase; }
