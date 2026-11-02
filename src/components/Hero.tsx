@@ -174,22 +174,6 @@ export default function Hero() {
         </motion.div>
       </div>
 
-      <motion.div
-        aria-hidden
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 2.6, duration: 1.2 }}
-        className="absolute bottom-6 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-3 text-paper/40 lg:flex"
-      >
-        <span className="eyebrow text-[0.62rem]">Scroll</span>
-        <span className="relative block h-12 w-px overflow-hidden bg-paper/15">
-          <motion.span
-            className="absolute inset-x-0 top-0 h-1/2 bg-cream"
-            animate={{ y: ["-100%", "200%"] }}
-            transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-          />
-        </span>
-      </motion.div>
     </section>
   );
 }
