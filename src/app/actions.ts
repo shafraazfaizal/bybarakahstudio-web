@@ -10,6 +10,7 @@ export type WaitlistState = {
   message?: string;
   name?: string;
   values?: { name: string; email: string };
+  email?: string;
 };
 
 const schema = z.object({
@@ -42,7 +43,7 @@ export async function joinWaitlist(_prev: WaitlistState, formData: FormData): Pr
     // Lets you preview the form locally before Supabase is connected.
     if (process.env.NODE_ENV !== "production") {
       console.warn("[waitlist] Supabase env vars missing — simulated signup for", email);
-      return { status: "success", name: firstName };
+      return { status: "success", name: firstName, email };
     }
     return { status: "error", message: "The waitlist isn't connected yet. Please try again soon.", values };
   }
@@ -73,5 +74,5 @@ export async function joinWaitlist(_prev: WaitlistState, formData: FormData): Pr
     if (r.status === "rejected") console.error("[waitlist] email failed:", r.reason);
   });
 
-  return { status: "success", name: firstName };
+  return { status: "success", name: firstName, email };
 }

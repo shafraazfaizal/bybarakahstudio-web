@@ -124,6 +124,12 @@ export default function Waitlist() {
                   </a>
                   .
                 </p>
+                {state.email && state.message !== "already" && (
+                  <p className="mt-6 max-w-sm border-t border-paper/10 pt-5 text-sm leading-relaxed text-paper/50">
+                    We&apos;ve sent a confirmation to <span className="text-paper/80">{state.email}</span>. Can&apos;t see it? Check
+                    your Promotions or Spam folder.
+                  </p>
+                )}
               </motion.div>
             ) : (
               <motion.form key={`form-${state.values?.email ?? ""}`} action={action} exit={{ opacity: 0, y: -20 }} className="space-y-8">
